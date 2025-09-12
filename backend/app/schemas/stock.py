@@ -27,8 +27,7 @@ class StockDetail(BaseModel):
     current_macd: Optional[float] = Field(None, description="현재 MACD")
     current_macd_signal: Optional[float] = Field(None, description="현재 MACD 신호선")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class StockDetailResponse(BaseResponse[StockDetail]):
@@ -45,8 +44,7 @@ class CandleData(BaseModel):
     close: float = Field(..., description="종가")
     volume: int = Field(..., description="거래량")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class TechnicalIndicator(BaseModel):
@@ -57,8 +55,7 @@ class TechnicalIndicator(BaseModel):
     macd_signal: Optional[float] = Field(None, description="MACD 신호선")
     macd_histogram: Optional[float] = Field(None, description="MACD 히스토그램")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ChartData(BaseModel):
@@ -68,8 +65,7 @@ class ChartData(BaseModel):
     candles: List[CandleData] = Field(..., description="캔들 데이터")
     indicators: List[TechnicalIndicator] = Field(..., description="기술적 지표")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ChartDataResponse(BaseResponse[ChartData]):
@@ -84,5 +80,4 @@ class StockSearchResult(BaseModel):
     sector: str = Field(..., description="섹터")
     market_type: str = Field(..., description="시장 구분 (KOSPI/KOSDAQ)")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

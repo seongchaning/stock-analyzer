@@ -18,8 +18,7 @@ class MarketIndex(BaseModel):
     volume: Optional[int] = Field(None, description="거래량")
     last_updated: datetime = Field(..., description="마지막 업데이트 시간")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class SectorStats(BaseModel):
@@ -30,8 +29,7 @@ class SectorStats(BaseModel):
     avg_change_percent: float = Field(..., description="평균 등락률")
     market_cap_ratio: float = Field(..., description="시가총액 비중 (%)")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class MarketStats(BaseModel):
@@ -49,8 +47,7 @@ class MarketStats(BaseModel):
     
     last_updated: datetime = Field(..., description="마지막 업데이트 시간")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class MarketStatsResponse(BaseResponse[MarketStats]):
@@ -74,5 +71,4 @@ class DataHealth(BaseModel):
     database_status: str = Field(..., description="데이터베이스 상태")
     api_status: str = Field(..., description="API 상태")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

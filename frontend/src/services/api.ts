@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApiResponse, BuySignal, Stock, ChartData, TechnicalIndicator, MarketStats } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc, func
 
 from app.models import Stock, TechnicalIndicator, BuySignal
-from app.schemas.screening import BuySignal as BuySignalSchema, ScreeningStats
+from app.schemas.screening_simple import BuySignal as BuySignalSchema
 
 
 class ScreeningService:
@@ -46,15 +46,20 @@ class ScreeningService:
         # ORM 객체를 Pydantic 스키마로 변환
         result = []
         for signal in signals:
-            stock_info = self._build_stock_info(signal.stock)
             buy_signal_schema = BuySignalSchema(
-                stock=stock_info,
+                symbol=signal.stock.symbol,
+                name=signal.stock.name,
+                price=signal.stock.price or 0.0,
+                change=signal.stock.change or 0.0,
+                change_percent=signal.stock.change_percent or 0.0,
+                market_cap=signal.stock.market_cap or 0,
+                sector=signal.stock.sector or "기타",
                 signal_strength=signal.signal_strength,
                 rsi=signal.rsi,
                 macd=signal.macd,
                 macd_signal=signal.macd_signal,
                 reason=signal.reason,
-                date=signal.date
+                date=str(signal.date)
             )
             result.append(buy_signal_schema)
         
@@ -112,7 +117,7 @@ class ScreeningService:
         
         return result
     
-    async def get_screening_stats(self) -> ScreeningStats:
+    async def get_screening_stats(self):
         """스크리닝 통계 조회"""
         
         # 활성 신호만 대상
@@ -157,10 +162,10 @@ class ScreeningService:
         )
         last_updated = last_signal.updated_at if last_signal else datetime.utcnow()
         
-        return ScreeningStats(
-            total_signals=total_signals,
-            strong_signals=strong_signals,
-            sector_distribution=sector_distribution,
-            avg_signal_strength=avg_signal_strength,
-            last_updated=last_updated
-        )
+        return {
+            "total_signals": total_signals,
+            "strong_signals": strong_signals,
+            "sector_distribution": sector_distribution,
+            "avg_signal_strength": avg_signal_strength,
+            "last_updated": last_updated
+        }

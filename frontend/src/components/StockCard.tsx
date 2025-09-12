@@ -8,10 +8,9 @@ interface StockCardProps {
 
 const StockCard: React.FC<StockCardProps> = ({ signal }) => {
   const navigate = useNavigate();
-  const { stock } = signal;
 
   const handleClick = () => {
-    navigate(`/stock/${stock.symbol}`);
+    navigate(`/stock/${signal.symbol}`);
   };
 
   const formatNumber = (num: number): string => {
@@ -49,22 +48,22 @@ const StockCard: React.FC<StockCardProps> = ({ signal }) => {
       {/* 헤더 */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{stock.name}</h3>
-          <p className="text-sm text-gray-500">{stock.symbol}</p>
+          <h3 className="text-lg font-semibold text-gray-900">{signal.name}</h3>
+          <p className="text-sm text-gray-500">{signal.symbol}</p>
         </div>
-        <div className={`px-2 py-1 rounded text-xs font-medium text-white ${getSignalStrengthColor(signal.signalStrength)}`}>
-          신호강도 {signal.signalStrength}
+        <div className={`px-2 py-1 rounded text-xs font-medium text-white ${getSignalStrengthColor(signal.signal_strength)}`}>
+          신호강도 {signal.signal_strength}
         </div>
       </div>
 
       {/* 가격 정보 */}
       <div className="mb-4">
         <div className="text-xl font-bold text-gray-900 mb-1">
-          {formatPrice(stock.price)}
+          {formatPrice(signal.price)}
         </div>
-        <div className={`text-sm font-medium ${getChangeColor(stock.change)}`}>
-          {stock.change > 0 ? '+' : ''}{formatPrice(stock.change)} 
-          ({stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%)
+        <div className={`text-sm font-medium ${getChangeColor(signal.change)}`}>
+          {signal.change > 0 ? '+' : ''}{formatPrice(signal.change)} 
+          ({signal.change_percent > 0 ? '+' : ''}{signal.change_percent.toFixed(2)}%)
         </div>
       </div>
 
@@ -84,11 +83,11 @@ const StockCard: React.FC<StockCardProps> = ({ signal }) => {
       <div className="border-t pt-4">
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>시가총액</span>
-          <span>{formatNumber(stock.marketCap)}</span>
+          <span>{formatNumber(signal.market_cap)}</span>
         </div>
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>섹터</span>
-          <span>{stock.sector}</span>
+          <span>{signal.sector}</span>
         </div>
         <div className="text-xs text-gray-400 mt-2">
           {signal.reason}

@@ -6,13 +6,13 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.screening import BuySignalResponse, SignalListResponse
+from app.schemas.screening_simple import BuySignal
 from app.services.screening_service import ScreeningService
 
 router = APIRouter()
 
 
-@router.get("/signals", response_model=SignalListResponse)
+@router.get("/signals")
 async def get_buy_signals(
     limit: int = 10,
     sector: str = None,
@@ -34,11 +34,11 @@ async def get_buy_signals(
             min_signal_strength=min_signal_strength
         )
         
-        return SignalListResponse(
-            data=signals,
-            message=f"{len(signals)}개의 매수 신호를 찾았습니다.",
-            success=True
-        )
+        return {
+            "data": signals,
+            "message": f"{len(signals)}개의 매수 신호 조회 완료",
+            "success": True
+        }
         
     except Exception as e:
         raise HTTPException(

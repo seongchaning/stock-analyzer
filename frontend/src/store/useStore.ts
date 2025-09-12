@@ -12,7 +12,7 @@ interface AppState {
   error: string | null;
   
   // 필터 상태
-  sortBy: 'signalStrength' | 'changePercent' | 'marketCap';
+  sortBy: 'signal_strength' | 'change_percent' | 'market_cap';
   filterSector: string | null;
   
   // 액션
@@ -21,7 +21,7 @@ interface AppState {
   setMarketStats: (stats: MarketStats | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setSortBy: (sortBy: 'signalStrength' | 'changePercent' | 'marketCap') => void;
+  setSortBy: (sortBy: 'signal_strength' | 'change_percent' | 'market_cap') => void;
   setFilterSector: (sector: string | null) => void;
   
   // 계산된 데이터
@@ -35,7 +35,7 @@ export const useStore = create<AppState>((set, get) => ({
   marketStats: null,
   isLoading: false,
   error: null,
-  sortBy: 'signalStrength',
+  sortBy: 'signal_strength',
   filterSector: null,
   
   // 액션
@@ -55,18 +55,18 @@ export const useStore = create<AppState>((set, get) => ({
     
     // 섹터 필터링
     if (filterSector) {
-      filtered = filtered.filter(signal => signal.stock.sector === filterSector);
+      filtered = filtered.filter(signal => signal.sector === filterSector);
     }
     
     // 정렬
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'signalStrength':
-          return b.signalStrength - a.signalStrength;
-        case 'changePercent':
-          return b.stock.changePercent - a.stock.changePercent;
-        case 'marketCap':
-          return b.stock.marketCap - a.stock.marketCap;
+        case 'signal_strength':
+          return b.signal_strength - a.signal_strength;
+        case 'change_percent':
+          return b.change_percent - a.change_percent;
+        case 'market_cap':
+          return b.market_cap - a.market_cap;
         default:
           return 0;
       }

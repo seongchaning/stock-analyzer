@@ -6,13 +6,13 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.stock import StockDetailResponse, ChartDataResponse
+from app.schemas.stock_simple import StockDetail, ChartData
 from app.services.stock_service import StockService
 
 router = APIRouter()
 
 
-@router.get("/{symbol}", response_model=StockDetailResponse)
+@router.get("/{symbol}", response_model=StockDetail)
 async def get_stock_detail(
     symbol: str,
     db: Session = Depends(get_db)
@@ -32,11 +32,7 @@ async def get_stock_detail(
                 detail=f"종목 {symbol}을(를) 찾을 수 없습니다."
             )
         
-        return StockDetailResponse(
-            data=stock_detail,
-            message=f"{symbol} 종목 정보 조회 완료",
-            success=True
-        )
+        return stock_detail
         
     except HTTPException:
         raise
@@ -47,7 +43,7 @@ async def get_stock_detail(
         )
 
 
-@router.get("/{symbol}/chart", response_model=ChartDataResponse)
+@router.get("/{symbol}/chart", response_model=ChartData)
 async def get_chart_data(
     symbol: str,
     period: str = Query("6M", regex="^(1M|3M|6M|1Y)$"),

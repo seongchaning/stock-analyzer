@@ -18,13 +18,18 @@ class StockInfo(BaseModel):
     market_cap: float = Field(..., description="시가총액")
     sector: str = Field(..., description="섹터")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class BuySignal(BaseModel):
     """매수 신호 정보"""
-    stock: StockInfo
+    symbol: str = Field(..., description="종목 코드")
+    name: str = Field(..., description="종목명")
+    price: float = Field(..., description="현재가")
+    change: float = Field(..., description="전일 대비 변화량")
+    change_percent: float = Field(..., description="전일 대비 변화율 (%)")
+    market_cap: float = Field(..., description="시가총액")
+    sector: str = Field(..., description="섹터")
     signal_strength: float = Field(..., ge=0, le=100, description="신호 강도 (0-100)")
     rsi: float = Field(..., description="RSI 값")
     macd: float = Field(..., description="MACD 값")
@@ -32,8 +37,7 @@ class BuySignal(BaseModel):
     reason: str = Field(..., description="신호 발생 이유")
     date: datetime = Field(..., description="신호 발생 일시")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class BuySignalResponse(BaseResponse[BuySignal]):
@@ -55,8 +59,7 @@ class SignalHistory(BaseModel):
     macd: float = Field(..., description="MACD 값")
     price: float = Field(..., description="해당 일자 종가")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ScreeningStats(BaseModel):
@@ -67,5 +70,4 @@ class ScreeningStats(BaseModel):
     avg_signal_strength: float = Field(..., description="평균 신호 강도")
     last_updated: datetime = Field(..., description="마지막 업데이트 시간")
     
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

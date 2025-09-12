@@ -49,10 +49,10 @@ const MarketOverview: React.FC = () => {
         <div className="text-center">
           <div className="text-sm text-gray-500 mb-1">코스피</div>
           <div className="text-xl font-bold text-gray-900 mb-1">
-            {formatIndex(marketStats.kospiIndex)}
+            {formatIndex(marketStats.kospi_index)}
           </div>
-          <div className={`text-sm font-medium ${getChangeColor(marketStats.kospiChange)}`}>
-            {formatChange(marketStats.kospiChange)}
+          <div className={`text-sm font-medium ${getChangeColor(marketStats.kospi_change)}`}>
+            {formatChange(marketStats.kospi_change)}
           </div>
         </div>
 
@@ -60,10 +60,10 @@ const MarketOverview: React.FC = () => {
         <div className="text-center">
           <div className="text-sm text-gray-500 mb-1">코스닥</div>
           <div className="text-xl font-bold text-gray-900 mb-1">
-            {formatIndex(marketStats.kosdaqIndex)}
+            {formatIndex(marketStats.kosdaq_index)}
           </div>
-          <div className={`text-sm font-medium ${getChangeColor(marketStats.kosdaqChange)}`}>
-            {formatChange(marketStats.kosdaqChange)}
+          <div className={`text-sm font-medium ${getChangeColor(marketStats.kosdaq_change)}`}>
+            {formatChange(marketStats.kosdaq_change)}
           </div>
         </div>
 
@@ -71,7 +71,7 @@ const MarketOverview: React.FC = () => {
         <div className="text-center">
           <div className="text-sm text-gray-500 mb-1">매수 신호</div>
           <div className="text-xl font-bold text-primary-600 mb-1">
-            {marketStats.signalCount}개
+            {marketStats.signal_count}개
           </div>
           <div className="text-sm text-gray-400">
             종목 발견
@@ -82,8 +82,8 @@ const MarketOverview: React.FC = () => {
         <div className="text-center">
           <div className="text-sm text-gray-500 mb-1">주요 섹터</div>
           <div className="text-sm font-medium text-gray-900">
-            {marketStats.topSectors.length > 0 
-              ? marketStats.topSectors.slice(0, 2).join(', ')
+            {marketStats.top_sectors.length > 0 
+              ? marketStats.top_sectors.slice(0, 2).join(', ')
               : '데이터 없음'
             }
           </div>

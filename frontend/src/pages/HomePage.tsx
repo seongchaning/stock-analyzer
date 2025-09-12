@@ -32,8 +32,11 @@ const HomePage: React.FC = () => {
         setBuySignals(signals);
         setMarketStats(stats);
       } catch (err) {
-        setError('데이터를 불러오는데 실패했습니다.');
-        console.error('Data fetch error:', err);
+        console.error('API Error Details:', err);
+        if (err instanceof Error) {
+          console.error('Error message:', err.message);
+        }
+        setError(`데이터를 불러오는데 실패했습니다. 오류: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -89,7 +92,7 @@ const HomePage: React.FC = () => {
           {filteredSignals.length > 0 ? (
             filteredSignals.map((signal, index) => (
               <StockCard 
-                key={`${signal.stock.symbol}-${index}`} 
+                key={`${signal.symbol}-${index}`} 
                 signal={signal} 
               />
             ))

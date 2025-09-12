@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc, or_, func
 
 from app.models import Stock, StockPrice, TechnicalIndicator
-from app.schemas.stock import StockDetail, ChartData, StockSearchResult
+from app.schemas.stock_simple import StockDetail, ChartData, StockSearchResult
 
 
 class StockService:

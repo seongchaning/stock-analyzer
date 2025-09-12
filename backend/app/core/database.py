@@ -9,13 +9,18 @@ from sqlalchemy.pool import StaticPool
 from app.core.config import settings
 
 # 무료 플랜 최적화 설정
-engine = create_engine(
-    settings.DATABASE_URL,
-    **settings.database_config,
-    # Railway PostgreSQL 무료 플랜 최적화
-    poolclass=StaticPool if "sqlite" in settings.DATABASE_URL else None,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
-)
+if "sqlite" in settings.DATABASE_URL:
+    engine = create_engine(
+        settings.DATABASE_URL,
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False},
+        echo=not settings.is_production
+    )
+else:
+    engine = create_engine(
+        settings.DATABASE_URL,
+        **settings.database_config
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

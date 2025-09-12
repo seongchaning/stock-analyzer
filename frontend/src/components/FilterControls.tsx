@@ -12,14 +12,14 @@ const FilterControls: React.FC = () => {
 
   // 유니크한 섹터 목록 생성
   const uniqueSectors = React.useMemo(() => {
-    const sectors = buySignals.map(signal => signal.stock.sector);
-    return [...new Set(sectors)].sort();
+    const sectors = buySignals.map(signal => signal.sector);
+    return Array.from(new Set(sectors)).sort();
   }, [buySignals]);
 
   const sortOptions = [
-    { value: 'signalStrength', label: '신호강도순' },
-    { value: 'changePercent', label: '등락률순' },
-    { value: 'marketCap', label: '시가총액순' },
+    { value: 'signal_strength', label: '신호강도순' },
+    { value: 'change_percent', label: '등락률순' },
+    { value: 'market_cap', label: '시가총액순' },
   ];
 
   return (
@@ -65,7 +65,7 @@ const FilterControls: React.FC = () => {
         {/* 초기화 버튼 */}
         <button
           onClick={() => {
-            setSortBy('signalStrength');
+            setSortBy('signal_strength');
             setFilterSector(null);
           }}
           className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors border border-gray-300"
@@ -78,19 +78,19 @@ const FilterControls: React.FC = () => {
           총 {buySignals.length}개 종목
           {filterSector && (
             <span className="ml-1">
-              ({filterSector}: {buySignals.filter(s => s.stock.sector === filterSector).length}개)
+              ({filterSector}: {buySignals.filter(s => s.sector === filterSector).length}개)
             </span>
           )}
         </div>
       </div>
 
       {/* 활성 필터 표시 */}
-      {(sortBy !== 'signalStrength' || filterSector) && (
+      {(sortBy !== 'signal_strength' || filterSector) && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <div className="flex flex-wrap gap-2">
             <span className="text-xs text-gray-500">적용된 필터:</span>
             
-            {sortBy !== 'signalStrength' && (
+            {sortBy !== 'signal_strength' && (
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary-100 text-primary-700">
                 {sortOptions.find(opt => opt.value === sortBy)?.label}
               </span>

@@ -20,10 +20,17 @@ export interface TechnicalIndicator {
 
 // 매수 신호 타입
 export interface BuySignal {
-  stock: Stock;
-  signalStrength: number;
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  change_percent: number;
+  market_cap: number;
+  sector: string;
+  signal_strength: number;
   rsi: number;
   macd: number;
+  macd_signal: number;
   reason: string;
   date: string;
 }
@@ -47,10 +54,13 @@ export interface ApiResponse<T> {
 
 // 시장 통계 타입
 export interface MarketStats {
-  kospiIndex: number;
-  kospiChange: number;
-  kosdaqIndex: number;
-  kosdaqChange: number;
-  signalCount: number;
-  topSectors: string[];
+  kospi_index: number;
+  kospi_change: number;
+  kosdaq_index: number;
+  kosdaq_change: number;
+  signal_count: number;
+  strong_signal_count: number;
+  top_sectors: string[];
+  sector_distribution: Record<string, number>;
+  last_updated: string;
 }
