@@ -1,0 +1,83 @@
+name: Daily Stock Data Collection
+
+on:
+  # 매일 18:00 UTC (한국시간 새벽 3시) 실행
+  schedule:
+    - cron: '0 18 * * 1-5'  # 주중만 실행
+  
+  # 수동 실행 가능
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: '강제 업데이트'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  collect-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # 무료 할당량 절약
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install --no-cache-dir -r requirements.txt
+    
+    - name: Collect stock data
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        MAX_STOCKS: 200
+        ENVIRONMENT: production
+      run: |
+        cd backend
+        python scripts/collect_daily_data.py
+    
+    - name: Run screening analysis
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        ENVIRONMENT: production
+      run: |
+        cd backend
+        python scripts/run_screening.py
+    
+    - name: Update market summary
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        ENVIRONMENT: production
+      run: |
+        cd backend
+        python scripts/update_market_summary.py
+    
+    - name: Send notification on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '❌ 데이터 수집 실패',
+            body: `데이터 수집 작업이 실패했습니다.\n\n실행 시간: ${new Date().toISOString()}\n워크플로우: ${context.workflow}`
+          });
+
+  # 성공시 Railway 앱 핑 (수면 모드 해제)
+  wake-up-railway:
+    needs: collect-data
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Wake up Railway app
+      run: |
+        curl -f ${{ secrets.RAILWAY_APP_URL }}/health || echo "Failed to wake up Railway app"
