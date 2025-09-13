@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 
 from app.core.database import engine
-from app.models.stock import Stock, DailyPrice, ScreeningResult, MarketSummary
+from app.models.stock import Stock, StockPrice, BuySignal, MarketSummary
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -29,12 +29,17 @@ def get_market_indices() -> dict:
     try:
         logger.info("📊 시장 지수 조회 중...")
         
+        # 최근 거래일 데이터 조회 (최대 5일)
+        from datetime import timedelta
+        today = date.today()
+        start_date = today - timedelta(days=5)
+        
         # 코스피 지수
-        kospi = fdr.DataReader('KS11', start=date.today(), end=date.today())
+        kospi = fdr.DataReader('KS11', start=start_date, end=today)
         kospi_today = kospi.iloc[-1] if not kospi.empty else None
         
         # 코스닥 지수  
-        kosdaq = fdr.DataReader('KQ11', start=date.today(), end=date.today())
+        kosdaq = fdr.DataReader('KQ11', start=start_date, end=today)
         kosdaq_today = kosdaq.iloc[-1] if not kosdaq.empty else None
         
         # 전일 대비 변동률 계산
@@ -79,30 +84,47 @@ def get_market_statistics() -> dict:
         today = date.today()
         stats = {}
         
-        # 전체 종목 변동 통계
-        price_stats = db.query(
-            func.sum((DailyPrice.change_rate > 0).cast(db.bind.dialect.INTEGER)).label('rising'),
-            func.sum((DailyPrice.change_rate < 0).cast(db.bind.dialect.INTEGER)).label('declining'),
-            func.sum((DailyPrice.change_rate == 0).cast(db.bind.dialect.INTEGER)).label('unchanged')
-        ).filter(DailyPrice.trade_date == today).first()
+        # 전체 종목 변동 통계 (SQLite 호환)
+        try:
+            rising_count = db.query(func.count(StockPrice.id)).filter(
+                StockPrice.date == today,
+                StockPrice.change_percent > 0
+            ).scalar() or 0
+            
+            declining_count = db.query(func.count(StockPrice.id)).filter(
+                StockPrice.date == today,
+                StockPrice.change_percent < 0
+            ).scalar() or 0
+            
+            stats['rising_stocks'] = rising_count
+            stats['declining_stocks'] = declining_count
+        except Exception as e:
+            logger.warning(f"주식 통계 계산 오류: {e}")
+            stats['rising_stocks'] = 0
+            stats['declining_stocks'] = 0
         
-        stats['rising_stocks'] = price_stats.rising or 0
-        stats['declining_stocks'] = price_stats.declining or 0
-        stats['unchanged_stocks'] = price_stats.unchanged or 0
-        
-        # 신호 통계
-        signal_stats = db.query(
-            func.count(ScreeningResult.id).label('total_signals'),
-            func.sum((ScreeningResult.signal_strength >= 80).cast(db.bind.dialect.INTEGER)).label('strong_signals')
-        ).filter(ScreeningResult.screening_date == today).first()
-        
-        stats['total_signals'] = signal_stats.total_signals or 0
-        stats['strong_signals'] = signal_stats.strong_signals or 0
+        # 신호 통계 (SQLite 호환)
+        try:
+            total_signals = db.query(func.count(BuySignal.id)).filter(
+                BuySignal.date == today
+            ).scalar() or 0
+            
+            strong_signals = db.query(func.count(BuySignal.id)).filter(
+                BuySignal.date == today,
+                BuySignal.signal_strength >= 80
+            ).scalar() or 0
+            
+            stats['total_signals'] = total_signals
+            stats['strong_signals'] = strong_signals
+        except Exception as e:
+            logger.warning(f"신호 통계 계산 오류: {e}")
+            stats['total_signals'] = 0
+            stats['strong_signals'] = 0
         
         # 섹터별 신호 분포
-        sector_signals = db.query(Stock.sector, func.count(ScreeningResult.id)).join(
-            ScreeningResult, Stock.symbol == ScreeningResult.symbol
-        ).filter(ScreeningResult.screening_date == today).group_by(Stock.sector).all()
+        sector_signals = db.query(Stock.sector, func.count(BuySignal.id)).join(
+            BuySignal, Stock.id == BuySignal.stock_id
+        ).filter(BuySignal.date == today).group_by(Stock.sector).all()
         
         # 상위 5개 섹터만
         sector_counter = Counter(dict(sector_signals))
@@ -143,7 +165,6 @@ def update_market_summary(indices: dict, stats: dict) -> None:
             existing.strong_signals = stats.get('strong_signals', 0)
             existing.rising_stocks = stats.get('rising_stocks', 0)
             existing.declining_stocks = stats.get('declining_stocks', 0)
-            existing.unchanged_stocks = stats.get('unchanged_stocks', 0)
             existing.top_sectors = stats.get('top_sectors', '')
         else:
             # 새 데이터 생성
@@ -157,7 +178,6 @@ def update_market_summary(indices: dict, stats: dict) -> None:
                 strong_signals=stats.get('strong_signals', 0),
                 rising_stocks=stats.get('rising_stocks', 0),
                 declining_stocks=stats.get('declining_stocks', 0),
-                unchanged_stocks=stats.get('unchanged_stocks', 0),
                 top_sectors=stats.get('top_sectors', '')
             )
             db.add(market_summary)

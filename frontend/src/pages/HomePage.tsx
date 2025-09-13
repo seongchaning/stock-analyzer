@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { stockApi } from '../services/api';
 import StockCard from '../components/StockCard';
@@ -69,12 +70,22 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {/* 헤더 */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🎯 한국 주식 매수 신호
-          </h1>
-          <p className="text-gray-600">
-            RSI 과매도 + MACD 골든크로스 기반 기술적 분석
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                🎯 한국 주식 매수 신호
+              </h1>
+              <p className="text-gray-600">
+                RSI 과매도 + MACD 골든크로스 기반 기술적 분석
+              </p>
+            </div>
+            <Link
+              to="/stocks"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              📋 전체 종목 리스트
+            </Link>
+          </div>
         </div>
 
         {/* 시장 개요 */}

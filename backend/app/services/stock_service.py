@@ -235,3 +235,30 @@ class StockService:
             ))
         
         return result
+    
+    async def get_stocks_list(
+        self,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[StockSearchResult]:
+        """전체 종목 리스트 조회 (시가총액 순)"""
+        
+        stocks = (
+            self.db.query(Stock)
+            .order_by(desc(Stock.market_cap))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+        
+        # ORM 객체를 Pydantic 모델로 변환
+        result = []
+        for stock in stocks:
+            result.append(StockSearchResult(
+                symbol=stock.symbol,
+                name=stock.name,
+                sector=stock.sector or "기타",
+                market_type=stock.market
+            ))
+        
+        return result

@@ -49,14 +49,80 @@ cp .env.example .env
 python scripts/init_db.py
 
 # 서버 실행
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 프론트엔드 설정
 ```bash
 cd frontend
 npm install
-npm run dev
+npm start
+```
+
+### 전체 시스템 실행 (권장)
+```bash
+# 터미널 1: 백엔드 서버
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# 터미널 2: 프론트엔드 서버  
+cd frontend
+npm start
+
+# 터미널 3: 데이터 수집 (선택사항)
+cd backend
+source venv/bin/activate
+python scripts/collect_daily_data.py
+```
+
+### 서비스 접속
+- **프론트엔드**: http://localhost:3000
+- **백엔드 API**: http://localhost:8000
+- **API 문서**: http://localhost:8000/docs
+
+## 🔄 재실행 방법
+
+### 전체 재시작
+```bash
+# 실행 중인 프로세스 종료 (Ctrl+C)
+# 또는 포트 강제 종료
+pkill -f "uvicorn\|npm"
+
+# 백엔드 재시작
+cd backend && source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 &
+
+# 프론트엔드 재시작  
+cd frontend && npm start &
+```
+
+### 데이터 업데이트
+```bash
+cd backend
+source venv/bin/activate
+
+# 일별 주식 데이터 수집
+python scripts/collect_daily_data.py
+
+# 시장 지수 업데이트
+python scripts/update_market_summary.py
+
+# 매수 신호 스크리닝
+python scripts/run_screening.py
+```
+
+### 문제 해결
+```bash
+# 포트 충돌 시 프로세스 확인
+lsof -i :3000  # 프론트엔드 포트
+lsof -i :8000  # 백엔드 포트
+
+# 프로세스 강제 종료
+kill -9 <PID>
+
+# 데이터베이스 재설정 (필요시)
+cd backend
+python scripts/init_db.py
 ```
 
 ## 📊 주요 기능

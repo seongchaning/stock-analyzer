@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import StockListPage from './pages/StockListPage';
 import './App.css';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/stocks" element={<StockListPage />} />
           {/* 추후 추가될 라우트들 */}
           {/* <Route path="/stock/:symbol" element={<StockDetailPage />} /> */}
         </Routes>

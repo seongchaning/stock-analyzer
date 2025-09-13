@@ -110,29 +110,39 @@ async def get_technical_indicators(
 
 
 @router.get("/")
-async def search_stocks(
-    query: str = Query(..., min_length=1, description="검색어"),
-    limit: int = Query(20, ge=1, le=100, description="반환할 최대 종목 수"),
+async def get_stocks_list(
+    query: str = Query(None, description="검색어 (선택사항)"),
+    limit: int = Query(50, ge=1, le=200, description="반환할 최대 종목 수"),
+    offset: int = Query(0, ge=0, description="페이지 오프셋"),
     db: Session = Depends(get_db)
 ):
     """
-    종목 검색
+    종목 리스트 조회 또는 검색
     
-    - **query**: 검색어 (종목명 또는 종목코드)
-    - **limit**: 반환할 최대 종목 수 (기본값: 20)
+    - **query**: 검색어 (종목명 또는 종목코드, 선택사항)
+    - **limit**: 반환할 최대 종목 수 (기본값: 50)
+    - **offset**: 페이지 오프셋 (기본값: 0)
     """
     try:
         service = StockService(db)
-        results = await service.search_stocks(query, limit)
+        
+        if query:
+            # 검색 모드
+            results = await service.search_stocks(query, limit)
+            message = f"'{query}' 검색 결과 {len(results)}개"
+        else:
+            # 전체 리스트 조회
+            results = await service.get_stocks_list(limit, offset)
+            message = f"종목 리스트 {len(results)}개 조회"
         
         return {
             "data": results,
-            "message": f"'{query}' 검색 결과 {len(results)}개",
+            "message": message,
             "success": True
         }
         
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"종목 검색 중 오류가 발생했습니다: {str(e)}"
+            detail=f"종목 조회 중 오류가 발생했습니다: {str(e)}"
         )
