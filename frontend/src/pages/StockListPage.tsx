@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface StockItem {
@@ -16,6 +16,7 @@ interface ApiResponse {
 }
 
 const StockListPage: React.FC = () => {
+  const navigate = useNavigate();
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,8 +164,7 @@ const StockListPage: React.FC = () => {
                     key={stock.symbol}
                     className="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => {
-                      // TODO: Navigate to stock detail page
-                      console.log('Navigate to stock:', stock.symbol);
+                      navigate(`/stock/${stock.symbol}`);
                     }}
                   >
                     <div className="grid grid-cols-4 gap-4 items-center">

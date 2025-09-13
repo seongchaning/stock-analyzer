@@ -12,7 +12,7 @@ from app.services.stock_service import StockService
 router = APIRouter()
 
 
-@router.get("/{symbol}", response_model=StockDetail)
+@router.get("/{symbol}")
 async def get_stock_detail(
     symbol: str,
     db: Session = Depends(get_db)
@@ -29,10 +29,14 @@ async def get_stock_detail(
         if not stock_detail:
             raise HTTPException(
                 status_code=404,
-                detail=f"종목 {symbol}을(를) 찾을 수 없습니다."
+                detail=f"종목 {symbol}을 찾을 수 없습니다."
             )
         
-        return stock_detail
+        return {
+            "data": stock_detail,
+            "message": f"{symbol} 종목 정보 조회 완료",
+            "success": True
+        }
         
     except HTTPException:
         raise
@@ -43,7 +47,7 @@ async def get_stock_detail(
         )
 
 
-@router.get("/{symbol}/chart", response_model=ChartData)
+@router.get("/{symbol}/chart")
 async def get_chart_data(
     symbol: str,
     period: str = Query("6M", regex="^(1M|3M|6M|1Y)$"),
@@ -65,11 +69,11 @@ async def get_chart_data(
                 detail=f"종목 {symbol}의 차트 데이터를 찾을 수 없습니다."
             )
         
-        return ChartDataResponse(
-            data=chart_data,
-            message=f"{symbol} 종목 {period} 차트 데이터 조회 완료",
-            success=True
-        )
+        return {
+            "data": chart_data,
+            "message": f"{symbol} 종목 {period} 차트 데이터 조회 완료",
+            "success": True
+        }
         
     except HTTPException:
         raise
